@@ -1,0 +1,49 @@
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64_debug/
+x64_release/
+x86_debug/
+x86_release/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+x64/
+x86/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Visual Studio 2017 auto generated files
+Generated\ Files/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+/res/software_res.rcc
+/license
+/tool_x64_debug
+/config/E81001457BAEEC765C622DEB13848A05.config
+/config/software_cfg.ini
+/source/a_r_software/app_res.cpp
+/source/graphics_plugin/GraphicsPlugin.aps
+/source/t_j_t_software/app_res.cpp
+/source/t_m_software/app_res.cpp
+/source/a_c_software/app_res.cpp
+
+/config/collect_info.config
