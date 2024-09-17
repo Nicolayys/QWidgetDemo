@@ -12,3 +12,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::execSqlWork(const QString &_exec_sql)
+{
+
+}
