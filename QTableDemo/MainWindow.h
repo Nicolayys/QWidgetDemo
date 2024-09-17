@@ -2,23 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTableView>
-#include <QToolButton>
-#include <QLineEdit>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QHeaderView>
-#include <QStandardItemModel>
-#include <QtConcurrent/QtConcurrent>
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QSqlError>
-#include <QIntValidator>
-#include <QListWidget>
-#include <QPushButton>
-#include <QMouseEvent>
-#include <QPainter>
+
+#include "PageWidget.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;

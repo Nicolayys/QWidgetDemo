@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    PageWidget *wid = new PageWidget(this);
+    wid->setGeometry(50,50,400,400);
+    wid->show();
 }
 
 MainWindow::~MainWindow()
