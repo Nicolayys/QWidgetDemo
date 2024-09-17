@@ -12,3 +12,8 @@ PageWidget::~PageWidget()
 {
     delete ui;
 }
+
+void PageWidget::execSqlWork(const QString &_exec_sql)
+{
+
+}
