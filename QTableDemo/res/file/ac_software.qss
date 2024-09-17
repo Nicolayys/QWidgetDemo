@@ -1,0 +1,314 @@
+/* 提示框整体界面 */
+QDialog#boxWidget
+{
+    background: transparent;
+    border-radius: 4px;
+}
+
+/* 通用弹窗messagebox标题label */
+QLabel#boxTitleLabel
+{
+    font-family: "PingFang SC Medium";
+    font-size: 14px;
+    color: rgb(51,51,51);
+    padding-left:0px;
+}
+
+/* 正文label */
+QLabel#textLabel
+{
+    font-family: "PingFang SC Regular";
+    font-size: 14px;
+    color: rgb(51,51,51);
+    padding-left:0px;
+}
+
+/* 登录界面标题label */
+QLabel#loginTitleLabel
+{
+    font-family: "PingFang SC Medium";
+    font-size: 16px;
+    color: #FFFFFF;
+    padding-left:0px;
+}
+
+/* 注册授权界面注册授权label */
+QLabel#registerLabel
+{
+    border:none;
+    border-style:none;
+    border-image:url(:/icon/注册授权背景.png);
+    font-family: "PingFang SC Medium";
+    font-size: 14px;
+    color: #FFFFFF;
+    padding-left:10px;
+}
+
+/* 注册授权界面数字label */
+QLabel#numLabel
+{
+    font-family: "PingFang SC Medium"Italic;
+    font-size: 16px;
+    font-style:italic;
+    color: #FFFFFF;
+    padding-left:0px;
+}
+
+/* 注册授权界面蓝色·label */
+QLabel#dotLabel
+{
+    font-size: 14px;
+    color: #147df4;
+    padding-left:0px;
+}
+
+/* 注册授权界面浅蓝色·label */
+QLabel#lightDotLabel
+{
+    font-size: 14px;
+    color: rgba(20, 125, 244, 0.24);
+    padding-left:0px;
+}
+
+/* 注册授权界面常用内容label */
+QLabel#registerContentLabel
+{
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: #FFFFFF;
+    padding-left:0px;
+}
+
+/* 注册授权界面前置描述label */
+QLabel#describeLabel
+{
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: #8AA8C3;
+    padding-left:0px;
+}
+
+/* 注册授权界面公司、电话label */
+QLabel#registerInfoLabel
+{
+    border:none;
+    border-style:none;
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: black;
+    padding-left:0px;
+}
+
+
+/* 授权注册界面编辑输入框 */
+QLineEdit#registerLineEdit
+{
+    height: 22px;
+    border: 0.5px solid #8AA8C3;
+    border-radius: 2px;
+    background:transparent;
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: #FFFFFF;
+}
+
+/* 主要按钮Btn */
+QPushButton#mainBtn
+{
+    background: rgba(20,125,244,1);
+    border: 1px solid rgba(20,125,244,1);
+    border-radius: 2px;
+    font-family: "PingFang SC Regular";
+    font-size: 14px;
+    color: #FFFFFF;
+}
+/* 主要按钮Btn hover */
+QPushButton#mainBtn:hover
+{
+    background: rgba(20,170,244,1);
+    border: 1px solid rgba(20,170,244,1);
+}
+/* 主要按钮Btn pressed */
+QPushButton#mainBtn:pressed
+{
+    background: rgba(20,125,244,0.9);
+    border: 1px solid rgba(20,125,244,0.9);
+}
+/* 主要按钮Btn disabled */
+QPushButton#mainBtn:disabled
+{
+    background: rgba(212,214,221,1);
+    border: 1px solid rgba(212,214,221,1);
+}
+
+/* 次要的按钮Btn */
+QPushButton#minorBtn
+{
+    background: transparent;
+    border-radius: 4px;
+    border: 1px solid rgba(20,125,244,1);
+    font-family: "PingFang SC Regular";
+    font-size: 14px;
+    color: rgba(20,125,244,1);
+}
+/* 次要的按钮Btn hover */
+QPushButton#minorBtn:hover
+{
+    background: rgba(20,125,244,0.2);
+    border: 1px solid rgba(20,125,244,1);
+}
+/* 次要的按钮Btn pressed */
+QPushButton#minorBtn:pressed
+{
+    border: 1px solid rgba(20,125,244,0.9);
+}
+/* 次要的按钮Btn disabled */
+QPushButton#minorBtn:disabled
+{
+    color: rgba(212,214,221,1);
+    border: 1px solid rgba(212,214,221,1);
+}
+
+/* 蓝色下划线按钮Btn */
+QPushButton#underLineBtn
+{
+    background: transparent;
+    text-decoration:underline;
+    text-align:left;
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: rgb(20,125,244);
+    padding:0px;
+}
+/* 蓝色下划线按钮Btn hover*/
+QPushButton#underLineBtn:hover
+{
+    color: rgb(20,170,244);
+}
+
+/* 生成申请表按钮Btn */
+QPushButton#createTableBtn
+{
+    background: rgba(20,125,244,1);
+    border-radius: 2px;
+    font-family: "PingFang SC Medium";
+    font-size: 14px;
+    color: #FFFFFF;
+}
+/* 生成申请表按钮Btn hover */
+QPushButton#createTableBtn:hover
+{
+    background: rgb(20,170,244);
+}
+/* 生成申请表按钮Btn pressed */
+QPushButton#createTableBtn:pressed
+{
+    background: rgba(20,125,244,0.9);
+}
+
+/* 注册按钮Btn */
+QPushButton#registerBtn
+{
+    background: rgb(20,125,244);
+    border: 0.5px solid rgba(20,125,244,1);
+    border-radius: 2px;
+    font-family: "PingFang SC Medium";
+    font-size: 14px;
+    color: #FFFFFF;
+}
+/* 注册按钮Btn 不可用*/
+QPushButton#registerBtn:disabled
+{
+    width: 290px;
+    height: 24px;
+    background: transparent;
+    border: 0.5px solid rgb(138,168,195);
+    border-radius: 2px;
+    font-family: "PingFang SC Regular";
+    font-size: 14px;
+    color: rgb(138,168,195);
+}
+/* 注册按钮Btn hover */
+QPushButton#registerBtn:hover
+{
+    background: rgb(20,170,244);
+    border: 0.5px solid rgb(20,170,244);
+}
+/* 注册按钮Btn pressed */
+QPushButton#registerBtn:pressed
+{
+    background: rgba(20,125,244,0.9);
+    border: 0.5px solid rgba(20,125,244,0.9);
+}
+
+/* 授权码信息QTextEdit */
+QTextEdit#accreditTextEdit
+{
+    background: transparent;
+    border: 0.5px solid rgba(138,168,195,1);
+    border-radius: 2px;
+    font-family: "PingFang SC Regular";
+    font-size: 12px;
+    color: rgb(138,168,195);
+    padding-left:0px;
+}
+
+/* 消息提示框-关闭按钮-正常 */
+QToolButton#messageBoxCloseBtn
+{
+    border-image:url(:/icon/消息框_关闭_正常.png);
+}
+
+/* 消息提示框-关闭按钮-悬浮 点击 */
+QToolButton#messageBoxCloseBtn:hover, #messageBoxCloseBtn:pressed
+{
+    border-image:url(:/icon/消息框_关闭_悬浮.png);
+}
+
+/* 主页标题关闭按钮Btn */
+QToolButton#mianTitleCloseBtn
+{
+    border-image:url(:/icon/主窗体_关闭_正常.png);
+}
+/* 主页标题关闭按钮Btn hover */
+QToolButton#mianTitleCloseBtn:hover
+{
+    border-image:url(:/icon/主窗体_关闭_悬浮.png);
+}
+/* 主页标题关闭按钮Btn pressed */
+QToolButton#mianTitleCloseBtn:pressed
+{
+    border-image:url(:/icon/主窗体_关闭_点击.png);
+}
+
+/* 注册授权界面 */
+QWidget#accreditWidget
+{
+    background: rgb(18,43,65);
+    border-radius: 4px;
+}
+
+/* 下边线界面 */
+QWidget#bottomLineWidget
+{
+    background: transparent;
+    border-left:none;
+    border-top:none;
+    border-right:none;
+    border-bottom:1px solid rgba(220,222,224,1);
+}
+
+#horizontalLine
+{
+    border:none;
+    background: rgba(255,255,255,0.1);
+}
+
+#verticalLine
+{
+    border:none;
+    background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                      stop: 0 rgba(138,168,195,0.00),
+                      stop: 0.5 #8AA8C3,
+                      stop: 1 rgba(138,168,195,0.00));
+}
