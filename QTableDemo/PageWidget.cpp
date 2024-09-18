@@ -1,21 +1,22 @@
 #include "PageWidget.h"
-#include "ui_PageWidget.h"
+// #include "ui_PageWidget.h"
 
 
 
 PageWidget::PageWidget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::PageWidget)
+    // , ui(new Ui::PageWidget)
 {
-    ui->setupUi(this);
+    // ui->setupUi(this);
 
     initPagingUi();
     initPagingStyle();
+    execSqlWork("");
 }
 
 PageWidget::~PageWidget()
 {
-    delete ui;
+    // delete ui;
 }
 
 void PageWidget::seekPreviousPageSlot()
@@ -148,7 +149,10 @@ void PageWidget::initPagingStyle()
 
 void PageWidget::execSqlWork(const QString &_exec_sql)
 {
-    QSettings database_ini_file(":/file/database.ini", QSettings::IniFormat);
+    // QSettings database_ini_file(":/file/database.ini", QSettings::IniFormat);
+
+    QSettings database_ini_file(QCoreApplication::applicationDirPath() + "/res/file/database.ini", QSettings::IniFormat);
+
     database_ini_file.beginGroup("Database");
     QString current_thread_id = "";
     /* 获取当前线程id的数据库连接,如果已经连接则不再添加数据库连接 */

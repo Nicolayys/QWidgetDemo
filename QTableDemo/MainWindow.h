@@ -19,8 +19,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    /* SQL执行工作 */
-    void execSqlWork(const QString & _exec_sql);
 private:
     Ui::MainWindow *ui;
 };

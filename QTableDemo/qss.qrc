@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/file/ac_software.qss</file>
+    </qresource>
+</RCC>

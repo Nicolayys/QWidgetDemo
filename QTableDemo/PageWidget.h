@@ -59,7 +59,7 @@ private:
     /* SQL执行工作 */
     void execSqlWork(const QString & _exec_sql);
 private:
-    Ui::PageWidget *ui;
+    // Ui::PageWidget *ui;
 
     /* 当前使用的SQL语句 */
     QString																							exec_sql_string_;
