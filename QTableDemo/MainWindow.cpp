@@ -7,8 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    PageWidget *wid = new PageWidget(this);
-    setCentralWidget(wid);
+    PageWidget *model_result_widget = new PageWidget(this);
+    setCentralWidget(model_result_widget);
     QFile qss_file(":/res/file/ac_software.qss");
     if (qss_file.open(QFile::ReadOnly))
     {
@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::warning(nullptr,"qss","加载qss文件失败");
     }
 
+
+    model_result_widget->setColumnWidth(0, 80);
+    model_result_widget->translateHeadNames(field_display_maps_);
 }
 
 MainWindow::~MainWindow()

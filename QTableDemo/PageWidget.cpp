@@ -19,6 +19,46 @@ PageWidget::~PageWidget()
     // delete ui;
 }
 
+void PageWidget::translateHeadNames(QMap<QString, QString> &_head_trs)
+{
+
+}
+
+void PageWidget::exec(const QString &_exec_sql)
+{
+
+}
+
+QString PageWidget::lastExecSql() const
+{
+
+}
+
+void PageWidget::setDelegateForColumn(int _column, QAbstractItemDelegate *_delegate)
+{
+
+}
+
+void PageWidget::appendColumns(const QString &_head_name, QVariantList _values)
+{
+
+}
+
+void PageWidget::insertColumns(int _column, const QString &_head_name, QVariantList _values)
+{
+
+}
+
+int PageWidget::columnCount()
+{
+
+}
+
+void PageWidget::setColumnWidth(int _column, int _width)
+{
+    paging_control_table_->setColumnWidth(_column,_width);
+}
+
 void PageWidget::seekPreviousPageSlot()
 {
 
@@ -125,6 +165,7 @@ void PageWidget::initPagingStyle()
     paging_control_table_->setContextMenuPolicy(Qt::CustomContextMenu);//添加右键菜单
     paging_control_table_->setSelectionMode(QAbstractItemView::SingleSelection);//设置选中模式
     paging_control_table_->setSortingEnabled(true);
+    paging_control_table_->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);// 设置 QTableView 的列宽根据内容自动调整
 
 
     hide_empty_btn_->setFixedSize(18, 18);
