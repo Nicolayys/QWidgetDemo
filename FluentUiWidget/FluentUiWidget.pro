@@ -10,10 +10,14 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    MainWindow.cpp
+    MainWindow.cpp \
+    private/FluentWindowPrivate.cpp \
+    src/FluentWindow.cpp
 
 HEADERS += \
-    MainWindow.h
+    MainWindow.h \
+    private/FluentWindowPrivate.h \
+    src/FluentWindow.h
 
 FORMS += \
     MainWindow.ui

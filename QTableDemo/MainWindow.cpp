@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     model_result_widget->setColumnWidth(0, 80);
-    model_result_widget->translateHeadNames(field_display_maps_);
+    // model_result_widget->translateHeadNames(field_display_maps_);
 }
 
 MainWindow::~MainWindow()

@@ -71,8 +71,6 @@ public:
     void setColumnWidth(int _column, int _width);
     /* 获取指定列的表头名称 */
     QString headName(int _column, bool _is_translate);
-    /* 设置界面样式 */
-    void initPagingStyle();
     /* 查询选择的对应列的全部数据 */
     QVariantList selectValues(int _column);
     /* 查询选择的对应列的全部数据, 二维数组 */

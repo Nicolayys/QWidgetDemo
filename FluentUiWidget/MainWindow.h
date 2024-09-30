@@ -3,13 +3,15 @@
 
 #include <QMainWindow>
 
+#include "src/FluentWindow.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
+class MainWindow : public FluentWindow
 {
     Q_OBJECT
 
@@ -18,6 +20,14 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    // Ui::MainWindow *ui;
+
+    void initWindow();
+    void initEdgeLayout();
+    void initContent();
+
+private:
+    int ThemeChangeTime{100};
+
 };
 #endif // MAINWINDOW_H
