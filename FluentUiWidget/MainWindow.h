@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "src/FluentWindow.h"
+// #include "src/FluentWindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -11,7 +11,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public FluentWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -20,7 +20,7 @@ public:
     ~MainWindow();
 
 private:
-    // Ui::MainWindow *ui;
+    Ui::MainWindow *ui;
 
     void initWindow();
     void initEdgeLayout();

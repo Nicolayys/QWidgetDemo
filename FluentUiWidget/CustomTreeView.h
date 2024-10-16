@@ -23,9 +23,14 @@ class CustomScrollbar : public QScrollBar
 public:
     explicit CustomScrollbar(QWidget *parent = nullptr);
     ~CustomScrollbar();
+    Q_PROPERTY(int target READ target WRITE setTarget NOTIFY targetChanged FINAL)
+    int target() const;
+    void setTarget(int newTarget);
 
 signals:
 
+
+    void targetChanged();
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -33,6 +38,8 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
+private:
+    int m_target;
 };
 
 #endif // CUSTOMTREEVIEW_H

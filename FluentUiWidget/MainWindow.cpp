@@ -2,10 +2,10 @@
 #include "ui_MainWindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : FluentWindow(parent)
-    // , ui(new Ui::MainWindow)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
-    // ui->setupUi(this);
+    ui->setupUi(this);
     initWindow();
 
     //额外布局
@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    // delete ui;
+    delete ui;
 }
 
 void MainWindow::initWindow()
