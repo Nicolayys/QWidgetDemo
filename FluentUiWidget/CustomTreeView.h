@@ -27,10 +27,13 @@ public:
     int target() const;
     void setTarget(int newTarget);
 
-signals:
 
 
+private:
     void targetChanged();
+signals:
+private slots:
+    void rangeChangedSlot(int _min,int _max);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

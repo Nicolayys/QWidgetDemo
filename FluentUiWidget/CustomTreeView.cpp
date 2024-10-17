@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QScroller>
+#include <QPropertyAnimation>
 
 CustomTreeView::CustomTreeView(QWidget *parent)
     : QTreeView{parent}
@@ -47,6 +48,7 @@ CustomScrollbar::CustomScrollbar(QWidget *parent)
     /* 设置滚动条样式 */
 
     // setStyle();
+    connect(this,&CustomScrollbar::rangeChanged,this,&CustomScrollbar::rangeChangedSlot);
 }
 
 CustomScrollbar::~CustomScrollbar()
@@ -90,4 +92,18 @@ void CustomScrollbar::setTarget(int newTarget)
         return;
     m_target = newTarget;
     emit targetChanged();
+}
+
+void CustomScrollbar::rangeChangedSlot(int _min, int _max)
+{
+    if(this->isVisible()&& _max != 0){
+        QPropertyAnimation * range_animation = new QPropertyAnimation(this,"");
+        /* 设置缓动曲线*/
+        range_animation->setEasingCurve(QEasingCurve::OutSine);
+        range_animation->setDuration(250);
+        range_animation->setStartValue(m_target);
+        range_animation->setEndValue(_max);
+        range_animation->start(QAbstractAnimation::DeleteWhenStopped);
+
+    }
 }
