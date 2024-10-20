@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="CustomTreeView" name="widget" native="true"/>
+     <widget class="CustomTreeView" name="tree_view_" native="true"/>
     </item>
    </layout>
   </widget>
