@@ -13,9 +13,12 @@ class CustomTreeView : public QTreeView
 public:
     explicit CustomTreeView(QWidget *parent = nullptr);
     ~CustomTreeView();
+
 signals:
+    void sendModelIndexSignal(const QModelIndex &index);
 private:
-    bool compareItemY(const QModelIndex& _previous, const QModelIndex& _current);
+
+
 private slots:
 
     void onTreeViewClickedSlot(const QModelIndex& index);
@@ -29,9 +32,11 @@ class CustomDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    CustomDelegate(QObject* parent = nullptr);
+    CustomDelegate(CustomTreeView* _tree_view,QObject* parent = nullptr);
     ~CustomDelegate();
-    void navigationNodeStateChange(QVariantMap data);
+
+public slots:
+    void sendModelIndexSlot(const QModelIndex &index);
 private:
     qreal _lastSelectMarkTop{10};
     qreal _lastSelectMarkBottom{10};
@@ -42,9 +47,17 @@ private:
     QPropertyAnimation* _selectMarkTopAnimation{nullptr};
     QPropertyAnimation* _selectMarkBottomAnimation{nullptr};
     bool _isSelectMarkDisplay{true};
+
+    CustomTreeView * tree_view_;  // 存储传入的 QTreeView 指针
+
+    QModelIndex previous_index_;  // 保存上一个节点
+    QModelIndex current_index_;   // 当前节点
+private:
+    bool compareItemY(const QModelIndex& _current, const QModelIndex& _previous);
 protected:
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 };
 
 
