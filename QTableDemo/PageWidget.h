@@ -20,6 +20,8 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QComboBox>
+#include <QSqlQueryModel>
+#include <QCheckBox>
 namespace Ui {
 class PageWidget;
 }
@@ -27,15 +29,17 @@ class PageWidget;
 class PageWidget : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit PageWidget(QWidget *parent = nullptr);
     ~PageWidget();
+    void setTableViewModel(QStandardItemModel * _model);
 
 
     /* 设置标题的名称翻译
         _head_trs			翻译字段集合， key = 原始名称，value = 翻译名称
     */
+
+    void setHeadNamesList(QStringList _head_list);
     void translateHeadNames(QMap<QString, QString> & _head_trs);
     /* 执行查询语句 */
     void exec(const QString & _exec_sql);
@@ -43,10 +47,6 @@ public:
     QString lastExecSql() const;
     /* 为某一列设置代理样式 */
     void setDelegateForColumn(int _column, QAbstractItemDelegate * _delegate);
-    /* 添加一列数据 */
-    void appendColumns(const QString & _head_name, QVariantList _values);
-    /* 插入一列数据 */
-    void insertColumns(int _column, const QString & _head_name, QVariantList _values);
     /* 获取表的总列数 */
     int columnCount();
     /* 获取表格总行数 */
@@ -102,6 +102,10 @@ private:
     void initPagingStyle();
     /* SQL执行工作 */
     void execSqlWork(const QString & _exec_sql);
+
+    QSqlDatabase createDatabase();
+
+    QString generateUUID();
 private:
     // Ui::PageWidget *ui;
 
@@ -133,11 +137,6 @@ private:
     QFutureWatcher<void>*																	exec_sql_watcher_;
     /* 数据Model缓存 */
     QFutureWatcher<void>*																	model_cache_watcher_;
-    /* 记录当前的数据视图模型 key = 字段名称，value = 此字段对应的一列数据 */
-    QMap<QString, QVariantList>															record_querys_;
-    /* 数据Model缓存 key = 缓存的页数，value = 缓存的model*/
-
-    // QMap<int, PageingSortModel*>														cache_models_;
 
     /* 总页数 */
     int																									total_table_page_;
@@ -147,6 +146,46 @@ private:
     int																									current_page_index_;
     /* 总数据条数 */
     int																									total_table_row_;
+
+
+    QStringList heads_list_;
 };
 
+
+// class CustomQueryModel : QSqlQueryModel
+// {
+
+//     Q_OBJECT
+// public:
+//     explict CustomQueryModel(QObject * parent = nullptr);
+//     ~CustomQueryModel();
+//     Q_OBJECT
+
+// };
+
+
+class CheckboxHeadView : public QHeaderView
+{
+    Q_OBJECT
+public:
+    explicit  CheckboxHeadView(Qt::Orientation orientation,QWidget * parent = nullptr);
+    ~CheckboxHeadView();
+
+    void setCheckbox(QCheckBox * _check_box);
+    bool getCheckedState();
+
+    void setHeaderCheckState(Qt::CheckState _state);
+Q_SIGNALS:
+    void headCheckBoxStatedSignal(bool _checked);
+
+private:
+    mutable QCheckBox * check_box_;
+    bool _is_checked = false;
+
+    Qt::CheckState check_state_;
+protected:
+    //绘制表头的单个部分（列或行）
+    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const;
+    void mousePressEvent(QMouseEvent *event);
+};
 #endif // PAGEWIDGET_H

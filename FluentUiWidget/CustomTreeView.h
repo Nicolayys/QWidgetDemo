@@ -44,6 +44,7 @@ private:
     qreal _selectMarkBottom{10};
     QPropertyAnimation* _lastSelectMarkTopAnimation{nullptr};
     QPropertyAnimation* _lastSelectMarkBottomAnimation{nullptr};
+
     QPropertyAnimation* _selectMarkTopAnimation{nullptr};
     QPropertyAnimation* _selectMarkBottomAnimation{nullptr};
     bool _isSelectMarkDisplay{true};

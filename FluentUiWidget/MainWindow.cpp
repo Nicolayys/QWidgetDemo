@@ -35,16 +35,16 @@ MainWindow::MainWindow(QWidget *parent)
     QStandardItem* rootItem1 = new QStandardItem();
     QStandardItem* descItem1 = new QStandardItem();
 
-    rootItem1->setData("Root Node3",Qt::UserRole+1);
-    descItem1->setData("Root Node4",Qt::UserRole+1);
-    model->appendRow(rootItem1);
-    model->appendRow(descItem1);
+    // rootItem1->setData("Root Node3",Qt::UserRole+1);
+    // descItem1->setData("Root Node4",Qt::UserRole+1);
+    // model->appendRow(rootItem1);
+    // model->appendRow(descItem1);
 
     // 插入子节点
-    // QStandardItem* childItem1 = new QStandardItem("Child 1");
-    // QStandardItem* childDesc1 = new QStandardItem("Description of Child 1");
-    // rootItem->appendRow(childItem1);
-    // rootItem->appendRow(childDesc1);
+    QStandardItem* childItem1 = new QStandardItem("Child 1");
+    QStandardItem* childDesc1 = new QStandardItem("Description of Child 1");
+    rootItem->appendRow(childItem1);
+    rootItem->appendRow(childDesc1);
 
     // QStandardItem* childItem2 = new QStandardItem("Child 2");
     // QStandardItem* childDesc2 = new QStandardItem("Description of Child 2");

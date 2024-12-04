@@ -1,6 +1,6 @@
 #include "CustomTreeView.h"
 
-#include <QDebug>
+#include <QApplication>
 #include <QHeaderView>
 #include <QModelIndex>
 #include <QMouseEvent>
@@ -9,6 +9,8 @@
 #include <QScroller>
 #include <QPropertyAnimation>
 #include <QDebug>
+#include <QStyleOptionViewItem>
+#include <QItemSelectionModel>
 CustomTreeView::CustomTreeView(QWidget *parent)
     : QTreeView{parent}
 {
@@ -55,13 +57,16 @@ CustomTreeView::CustomTreeView(QWidget *parent)
 
     connect(this,&CustomTreeView::clicked,this,&CustomTreeView::onTreeViewClickedSlot);
 
+
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 }
 void CustomTreeView::onTreeViewClickedSlot(const QModelIndex& index)
 {
-    // emit sendModelIndexSignal(previous_index_);
-    // previous_index_ = index;
+    if(index != previous_index_){
+        emit sendModelIndexSignal(previous_index_);
+    }
+    previous_index_ = index;
 }
 CustomTreeView::~CustomTreeView()
 {
@@ -162,7 +167,7 @@ CustomDelegate::CustomDelegate(CustomTreeView* _tree_view,QObject *parent): QSty
     _selectMarkBottomAnimation->setDuration(300);
     _selectMarkBottomAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkTopAnimation, &QPropertyAnimation::finished, this, [=]() {
-        _isSelectMarkDisplay = true;
+        // _isSelectMarkDisplay = true;
         // _lastSelectedNode = nullptr;
         _selectMarkBottomAnimation->setStartValue(0);
         _selectMarkBottomAnimation->setEndValue(10);
@@ -183,14 +188,14 @@ CustomDelegate::CustomDelegate(CustomTreeView* _tree_view,QObject *parent): QSty
     _selectMarkTopAnimation->setDuration(300);
     _selectMarkTopAnimation->setEasingCurve(QEasingCurve::InOutSine);
     connect(_lastSelectMarkBottomAnimation, &QPropertyAnimation::finished, this, [=]() {
-        _isSelectMarkDisplay = true;
+        // _isSelectMarkDisplay = true;
         // _lastSelectedNode = nullptr;
         _selectMarkTopAnimation->setStartValue(0);
         _selectMarkTopAnimation->setEndValue(10);
         _selectMarkTopAnimation->start(); });
 
 
-    // connect(tree_view_,&CustomTreeView::sendModelIndexSignal,this,&CustomDelegate::sendModelIndexSlot);
+    connect(tree_view_,&CustomTreeView::sendModelIndexSignal,this,&CustomDelegate::sendModelIndexSlot);
 }
 
 CustomDelegate::~CustomDelegate()
@@ -200,6 +205,34 @@ CustomDelegate::~CustomDelegate()
 void CustomDelegate::sendModelIndexSlot(const QModelIndex& index)
 {
     // qDebug()<<"11";
+    previous_index_ = index;
+    current_index_ = tree_view_->currentIndex();
+
+
+    bool flag = compareItemY(index,previous_index_);
+    _lastSelectMarkTop = 10;
+    _lastSelectMarkBottom = 10;
+    _selectMarkTop = 10;
+    _selectMarkBottom = 10;
+    if(flag){
+        /* 当前节点高于上一个节点，向上 */
+        _lastSelectMarkTopAnimation->setStartValue(10);
+        _lastSelectMarkTopAnimation->setEndValue(0);
+        _lastSelectMarkTopAnimation->start();
+        _lastSelectMarkBottomAnimation->stop();
+        _selectMarkTopAnimation->stop();
+        _isSelectMarkDisplay = false;
+
+    }else{
+        /* 当前节点低于上一个节点，向下 */
+        _lastSelectMarkBottomAnimation->setStartValue(10);
+        _lastSelectMarkBottomAnimation->setEndValue(0);
+        _lastSelectMarkBottomAnimation->start();
+        _lastSelectMarkTopAnimation->stop();
+        _selectMarkBottomAnimation->stop();
+        _isSelectMarkDisplay = false;
+    }
+
 }
 
 bool CustomDelegate::compareItemY(const QModelIndex& _current, const QModelIndex& _previous)
@@ -221,6 +254,7 @@ bool CustomDelegate::compareItemY(const QModelIndex& _current, const QModelIndex
     return false;
 }
 
+
 void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     /* 视图更新时触发，每个项的 paint() 被调用 */
@@ -235,6 +269,24 @@ void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     painter->save();
     /* 启用抗锯齿效果 */
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
+
+
+    if(index.model()->hasChildren(index)){
+        QStyleOption arrow_option;
+        arrow_option.rect = QRect(option.rect.right() - 20, option.rect.top(), 20, option.rect.height()); // 右侧的箭头位置
+
+        arrow_option.state = QStyle::State_Children;
+
+        // 判断当前节点是展开状态还是折叠状态
+        if (view_option.state & QStyle::State_Open) {
+            // 节点展开 -> 向上箭头
+            arrow_option.state |= QStyle::State_Open;
+        }
+
+        // 绘制箭头
+        QApplication::style()->drawPrimitive(QStyle::PE_IndicatorBranch, &arrow_option, painter);
+
+    }
 
     /* 文字绘制 */
     QRect item_rect = option.rect;
@@ -251,24 +303,16 @@ void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     /* 设置无边框 */
     painter->setPen(Qt::NoPen);
 
-
-    if(index.isValid() && current_index_ == index && _isSelectMarkDisplay){
+    if(index.isValid() && current_index_ == index){
         /* 矩形区域 x,y 宽度，高度 */
         QRectF rect(item_rect.x() +3,item_rect.y() + _selectMarkTop,3, item_rect.height() - _selectMarkTop - _selectMarkBottom);
         /* 3,3 圆角半径 */
         painter->drawRoundedRect(rect, 3, 3);
-
-        int row = index.row();
-        qDebug()<<"current-----"<<row;
     }
 
-
-    if(index.isValid() && index == previous_index_){
+    if(previous_index_.isValid() && index == previous_index_){
         QRectF rect(item_rect.x() +3,item_rect.y() + _lastSelectMarkTop,3, item_rect.height() - _lastSelectMarkTop - _lastSelectMarkBottom);
         painter->drawRoundedRect(rect, 3, 3);
-
-        int row = previous_index_.row();
-        qDebug()<<"last-----"<<row;
     }
 
     /* 恢复绘图状态 */
@@ -286,6 +330,7 @@ QSize CustomDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelI
 
 bool CustomDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
+#if 0
     if(event->type() == QEvent::MouseButtonRelease){
 
 
@@ -312,7 +357,7 @@ bool CustomDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
             _lastSelectMarkTopAnimation->start();
             _lastSelectMarkBottomAnimation->stop();
             _selectMarkTopAnimation->stop();
-            _isSelectMarkDisplay = false;
+            // _isSelectMarkDisplay = false;
 
         }else{
             /* 当前节点低于上一个节点，向下 */
@@ -321,10 +366,10 @@ bool CustomDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
             _lastSelectMarkBottomAnimation->start();
             _lastSelectMarkTopAnimation->stop();
             _selectMarkBottomAnimation->stop();
-            _isSelectMarkDisplay = false;
+            // _isSelectMarkDisplay = false;
         }
     }
-
+#endif
     return QStyledItemDelegate::editorEvent(event,model,option,index);
 }
 

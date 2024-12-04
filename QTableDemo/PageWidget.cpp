@@ -1,14 +1,11 @@
 #include "PageWidget.h"
-// #include "ui_PageWidget.h"
-
-
+#include <QUuid>
+#include <QApplication>
+#include <QCheckBox>
 
 PageWidget::PageWidget(QWidget *parent)
     : QWidget(parent)
-    // , ui(new Ui::PageWidget)
 {
-    // ui->setupUi(this);
-
     initPagingUi();
     initPagingStyle();
     execSqlWork("");
@@ -16,7 +13,16 @@ PageWidget::PageWidget(QWidget *parent)
 
 PageWidget::~PageWidget()
 {
-    // delete ui;
+}
+
+void PageWidget::setTableViewModel(QStandardItemModel *_model)
+{
+    paging_control_table_->setModel(_model);
+}
+
+void PageWidget::setHeadNamesList(QStringList _head_list)
+{
+    heads_list_ = _head_list;
 }
 
 void PageWidget::translateHeadNames(QMap<QString, QString> &_head_trs)
@@ -36,17 +42,10 @@ QString PageWidget::lastExecSql() const
 
 void PageWidget::setDelegateForColumn(int _column, QAbstractItemDelegate *_delegate)
 {
-
-}
-
-void PageWidget::appendColumns(const QString &_head_name, QVariantList _values)
-{
-
-}
-
-void PageWidget::insertColumns(int _column, const QString &_head_name, QVariantList _values)
-{
-
+    if(!_delegate){
+        return;
+    }
+    paging_control_table_->setItemDelegateForColumn(_column,_delegate);
 }
 
 int PageWidget::columnCount()
@@ -142,7 +141,22 @@ void PageWidget::initPagingUi()
     connect(select_page_max_row_cb_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PageWidget::switchPageRowSlot);
     connect(paging_control_table_, &QTableView::clicked, this, &PageWidget::mouseClickCellSignal);
 
+    CheckboxHeadView * check_head_view = new CheckboxHeadView(Qt::Horizontal,paging_control_table_);
 
+    // QCheckBox *checkBox = new QCheckBox("选择", this);
+    // check_head_view->setCheckbox(checkBox);
+    // connect(checkBox, &QCheckBox::toggled, this, [this](bool checked) {
+    //     // 在此处处理复选框状态更改的逻辑，例如全选或全不选
+    //     // 比如你可以遍历表格的数据模型，更新所有行的选中状态
+    //     qDebug() << "复选框状态:" << (checked ? "选中" : "未选中");
+    // });
+
+    // 连接复选框状态变化的信号
+    connect(check_head_view, &CheckboxHeadView::headCheckBoxStatedSignal, this, [this](bool checked) {
+        qDebug() << "复选框状态:" << (checked ? "选中" : "未选中");
+        // 你可以在这里执行其他的逻辑，比如全选或全不选
+    });
+    paging_control_table_->setHorizontalHeader(check_head_view);
 }
 
 void PageWidget::initPagingStyle()
@@ -232,6 +246,92 @@ void PageWidget::execSqlWork(const QString &_exec_sql)
     if (total_table_row_ == 0) {
 
         return;
+    }
+
+}
+
+QSqlDatabase PageWidget::createDatabase()
+{
+    QSettings database_ini_file(":/file/database.ini", QSettings::IniFormat);
+    database_ini_file.beginGroup("Database");
+
+    QString current_thread_id = QString::number((qint64)QThread::currentThreadId());
+    QSqlDatabase paging_control_db = QSqlDatabase::addDatabase(database_ini_file.value("type").toString().toUpper(),current_thread_id);
+
+}
+
+QString PageWidget::generateUUID()
+{
+    return QUuid::createUuid().toString().remove("{").remove("}").toLower();
+}
+
+CheckboxHeadView::CheckboxHeadView(Qt::Orientation orientation, QWidget *parent) : QHeaderView(orientation,parent)
+{
+    // check_box_ = new QCheckBox(this);
+    // check_box_->setVisible(false);
+}
+
+CheckboxHeadView::~CheckboxHeadView()
+{
+
+}
+
+void CheckboxHeadView::setCheckbox(QCheckBox * _check_box)
+{
+    check_box_ = _check_box;
+}
+
+bool CheckboxHeadView::getCheckedState()
+{
+    return _is_checked;
+}
+
+void CheckboxHeadView::setHeaderCheckState(Qt::CheckState _state)
+{
+    check_state_ = _state;
+}
+
+void CheckboxHeadView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const
+{
+
+    if(logicalIndex == 0){
+        QStyleOptionButton option;
+        option.rect = rect.adjusted(10,5,-5,-5);
+        option.state = QStyle::State_Enabled;
+
+        if (check_state_ == Qt::Checked) {
+            option.state |= QStyle::State_On;
+        } else if (check_state_ == Qt::PartiallyChecked) {
+            option.state |= QStyle::State_NoChange;
+        } else {
+            option.state |= QStyle::State_Off;
+        }
+
+        // if(check_box_ && check_box_->isChecked()){
+        //     option.state |= QStyle::State_On;
+        // }else{
+        //     option.state |= QStyle::State_Off;
+        // }
+        //第四个参数用来应用样式设置
+        QCheckBox * check_obx = new QCheckBox();
+        QApplication::style()->drawControl(QStyle::CE_CheckBox,&option,painter,check_obx);
+
+    }else{
+        QHeaderView::paintSection(painter,rect,logicalIndex);
+    }
+}
+
+void CheckboxHeadView::mousePressEvent(QMouseEvent *event)
+{
+    int section = sectionViewportPosition(0);
+    int width = sectionSize(0);
+    QRect check_rect(section+5,0,width-10,height());
+    if(check_rect.contains(event->pos())){
+        _is_checked = !_is_checked;
+        emit headCheckBoxStatedSignal(_is_checked);
+        viewport()->update();
+    }else{
+        QHeaderView::mousePressEvent(event);
     }
 
 }
