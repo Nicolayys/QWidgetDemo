@@ -56,8 +56,6 @@ CustomTreeView::CustomTreeView(QWidget *parent)
     QScroller::scroller(this->viewport())->setScrollerProperties(properties);
 
     connect(this,&CustomTreeView::clicked,this,&CustomTreeView::onTreeViewClickedSlot);
-
-
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 }
@@ -66,6 +64,7 @@ void CustomTreeView::onTreeViewClickedSlot(const QModelIndex& index)
     if(index != previous_index_){
         emit sendModelIndexSignal(previous_index_);
     }
+    emit sendModelIndexSignal(previous_index_);
     previous_index_ = index;
 }
 CustomTreeView::~CustomTreeView()
@@ -221,7 +220,7 @@ void CustomDelegate::sendModelIndexSlot(const QModelIndex& index)
         _lastSelectMarkTopAnimation->start();
         _lastSelectMarkBottomAnimation->stop();
         _selectMarkTopAnimation->stop();
-        _isSelectMarkDisplay = false;
+        // _isSelectMarkDisplay = false;
 
     }else{
         /* 当前节点低于上一个节点，向下 */
@@ -230,7 +229,7 @@ void CustomDelegate::sendModelIndexSlot(const QModelIndex& index)
         _lastSelectMarkBottomAnimation->start();
         _lastSelectMarkTopAnimation->stop();
         _selectMarkBottomAnimation->stop();
-        _isSelectMarkDisplay = false;
+        // _isSelectMarkDisplay = false;
     }
 
 }
@@ -270,7 +269,6 @@ void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     /* 启用抗锯齿效果 */
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
 
-
     if(index.model()->hasChildren(index)){
         QStyleOption arrow_option;
         arrow_option.rect = QRect(option.rect.right() - 20, option.rect.top(), 20, option.rect.height()); // 右侧的箭头位置
@@ -303,16 +301,30 @@ void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     /* 设置无边框 */
     painter->setPen(Qt::NoPen);
 
+
+    QString text45 = current_index_.data(Qt::UserRole+1).toString();
+    QString text1 = previous_index_.data(Qt::UserRole+1).toString();
+
     if(index.isValid() && current_index_ == index){
         /* 矩形区域 x,y 宽度，高度 */
         QRectF rect(item_rect.x() +3,item_rect.y() + _selectMarkTop,3, item_rect.height() - _selectMarkTop - _selectMarkBottom);
         /* 3,3 圆角半径 */
         painter->drawRoundedRect(rect, 3, 3);
+
+        int row = index.row();
+        // qDebug()<<"current-----"<<row; 3 10 3 20
+        QString text = current_index_.data(Qt::UserRole+1).toString();
+        QString text1 = previous_index_.data(Qt::UserRole+1).toString();
+        qDebug()<<"current-----"<<text;
+        qDebug()<<"previous-----"<<text1;
     }
 
     if(previous_index_.isValid() && index == previous_index_){
         QRectF rect(item_rect.x() +3,item_rect.y() + _lastSelectMarkTop,3, item_rect.height() - _lastSelectMarkTop - _lastSelectMarkBottom);
         painter->drawRoundedRect(rect, 3, 3);
+
+        int row = previous_index_.row();
+        // qDebug()<<"last-----"<<row;
     }
 
     /* 恢复绘图状态 */

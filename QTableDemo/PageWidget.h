@@ -152,16 +152,13 @@ private:
 };
 
 
-// class CustomQueryModel : QSqlQueryModel
-// {
-
-//     Q_OBJECT
-// public:
-//     explict CustomQueryModel(QObject * parent = nullptr);
-//     ~CustomQueryModel();
-//     Q_OBJECT
-
-// };
+class CustomQueryModel :public  QSqlQueryModel
+{
+    Q_OBJECT
+public:
+    explicit CustomQueryModel(QObject * parent = nullptr);
+    ~CustomQueryModel();
+};
 
 
 class CheckboxHeadView : public QHeaderView

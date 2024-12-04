@@ -306,12 +306,6 @@ void CheckboxHeadView::paintSection(QPainter *painter, const QRect &rect, int lo
         } else {
             option.state |= QStyle::State_Off;
         }
-
-        // if(check_box_ && check_box_->isChecked()){
-        //     option.state |= QStyle::State_On;
-        // }else{
-        //     option.state |= QStyle::State_Off;
-        // }
         //第四个参数用来应用样式设置
         QCheckBox * check_obx = new QCheckBox();
         QApplication::style()->drawControl(QStyle::CE_CheckBox,&option,painter,check_obx);
@@ -333,5 +327,15 @@ void CheckboxHeadView::mousePressEvent(QMouseEvent *event)
     }else{
         QHeaderView::mousePressEvent(event);
     }
+
+}
+
+CustomQueryModel::CustomQueryModel(QObject *parent)
+{
+
+}
+
+CustomQueryModel::~CustomQueryModel()
+{
 
 }
