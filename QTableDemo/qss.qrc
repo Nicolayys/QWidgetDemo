@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/file/ac_software.qss</file>
+        <file>file/ac_software.qss</file>
+        <file>file/database.ini</file>
     </qresource>
 </RCC>

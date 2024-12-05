@@ -37,4 +37,36 @@ private:
     QScopedPointer<QCheckBox> 													check_;
     QFontMetrics*																		use_font_metrics_;
 };
+
+
+
+class CheckBoxDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+
+public:
+    CheckBoxDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+protected:
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QCheckBox *editor = new QCheckBox(parent);
+        return editor;
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override {
+        QCheckBox *checkBox = qobject_cast<QCheckBox *>(editor);
+        if (checkBox) {
+            checkBox->setChecked(index.data(Qt::CheckStateRole).toBool());
+        }
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        QCheckBox *checkBox = qobject_cast<QCheckBox *>(editor);
+        if (checkBox) {
+            model->setData(index, checkBox->isChecked(), Qt::CheckStateRole);
+        }
+    }
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        editor->setGeometry(option.rect);
+    }
+};
 #endif // CUSTOMDELEGATE_H

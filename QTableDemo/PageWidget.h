@@ -26,13 +26,38 @@ namespace Ui {
 class PageWidget;
 }
 
+class CheckboxHeadView : public QHeaderView
+{
+    Q_OBJECT
+public:
+    explicit  CheckboxHeadView(Qt::Orientation orientation,QWidget * parent = nullptr);
+    ~CheckboxHeadView();
+
+    void setCheckbox(QCheckBox * _check_box);
+    bool getCheckedState();
+
+    void setCheckState(Qt::CheckState _state);
+Q_SIGNALS:
+    void checkStateChanged(Qt::CheckState _checked);
+
+private:
+    mutable QCheckBox * check_box_;
+    bool _is_checked = false;
+
+    Qt::CheckState check_state_;
+protected:
+    //绘制表头的单个部分（列或行）
+    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const;
+    void mousePressEvent(QMouseEvent *event);
+};
+
 class PageWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit PageWidget(QWidget *parent = nullptr);
     ~PageWidget();
-    void setTableViewModel(QStandardItemModel * _model);
+    void setModel(QStandardItemModel * _model);
 
 
     /* 设置标题的名称翻译
@@ -95,6 +120,11 @@ private slots:
     void hideColumnSlot();
     /* 隐藏当前页面中的空列 */
     void hideEmptyColumnSlot();
+
+    void onDataChangedSlot(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                           const QList<int> &roles = QList<int>());
+
+    void updateCheckBoxStateSlot(Qt::CheckState _checked);
 private:
     /* 初始化分页控件界面布局 */
     void initPagingUi();
@@ -104,8 +134,10 @@ private:
     void execSqlWork(const QString & _exec_sql);
 
     QSqlDatabase createDatabase();
-
+    void removeDatabase();
+    bool removeDatabase(QSqlDatabase _database);
     QString generateUUID();
+
 private:
     // Ui::PageWidget *ui;
 
@@ -149,6 +181,10 @@ private:
 
 
     QStringList heads_list_;
+
+
+    QStandardItemModel *standard_item_model_;
+    CheckboxHeadView * check_head_view{nullptr};
 };
 
 
@@ -158,31 +194,18 @@ class CustomQueryModel :public  QSqlQueryModel
 public:
     explicit CustomQueryModel(QObject * parent = nullptr);
     ~CustomQueryModel();
-};
 
 
-class CheckboxHeadView : public QHeaderView
-{
-    Q_OBJECT
+    bool setName(int studentId, const QString &name);
+    void refresh();
+    // QAbstractItemModel interface
 public:
-    explicit  CheckboxHeadView(Qt::Orientation orientation,QWidget * parent = nullptr);
-    ~CheckboxHeadView();
-
-    void setCheckbox(QCheckBox * _check_box);
-    bool getCheckedState();
-
-    void setHeaderCheckState(Qt::CheckState _state);
-Q_SIGNALS:
-    void headCheckBoxStatedSignal(bool _checked);
-
-private:
-    mutable QCheckBox * check_box_;
-    bool _is_checked = false;
-
-    Qt::CheckState check_state_;
-protected:
-    //绘制表头的单个部分（列或行）
-    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const;
-    void mousePressEvent(QMouseEvent *event);
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
 };
+
+
+
+
 #endif // PAGEWIDGET_H

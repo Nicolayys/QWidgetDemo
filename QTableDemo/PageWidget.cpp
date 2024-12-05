@@ -3,21 +3,24 @@
 #include <QApplication>
 #include <QCheckBox>
 
+#include <QStandardItemModel>
 PageWidget::PageWidget(QWidget *parent)
     : QWidget(parent)
 {
     initPagingUi();
     initPagingStyle();
-    execSqlWork("");
+    execSqlWork("SELECT * FROM students");
 }
 
 PageWidget::~PageWidget()
 {
 }
 
-void PageWidget::setTableViewModel(QStandardItemModel *_model)
+void PageWidget::setModel(QStandardItemModel *_model)
 {
     paging_control_table_->setModel(_model);
+    standard_item_model_=_model;
+    connect(standard_item_model_, &QAbstractItemModel::dataChanged, this, &PageWidget::onDataChangedSlot);
 }
 
 void PageWidget::setHeadNamesList(QStringList _head_list)
@@ -88,6 +91,54 @@ void PageWidget::hideEmptyColumnSlot()
 
 }
 
+void PageWidget::onDataChangedSlot(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+{
+    if (topLeft.column() == 0) {
+        bool allChecked = true;
+        bool anyChecked = false;
+
+        // 检查每一行复选框的状态
+        for (int row = 0; row < standard_item_model_->rowCount(); ++row) {
+            Qt::CheckState state = static_cast<Qt::CheckState>(standard_item_model_->data(standard_item_model_->index(row, 0), Qt::CheckStateRole).toInt());
+            if (state == Qt::Unchecked) {
+                allChecked = false;
+            } else if (state == Qt::Checked) {
+                anyChecked = true;
+            }
+        }
+
+        // 根据行复选框的状态设置表头复选框的状态
+        if (allChecked) {
+            check_head_view->setCheckState(Qt::Checked);
+        } else if (anyChecked) {
+            check_head_view->setCheckState(Qt::PartiallyChecked);
+        } else {
+            check_head_view->setCheckState(Qt::Unchecked);
+        }
+
+        check_head_view->viewport()->update();  // 重新绘制表头
+    }
+}
+
+void PageWidget::updateCheckBoxStateSlot(Qt::CheckState _checked)
+{
+    qDebug() << "复选框状态:" << (_checked ? "选中" : "未选中");
+    // 检查每一行复选框的状态
+    int row = standard_item_model_->rowCount();
+    qInfo()<<row;
+    for (int row = 0; row < standard_item_model_->rowCount(); ++row) {
+        QModelIndex model_index = standard_item_model_->index(row,0);
+        Qt::CheckState state = static_cast<Qt::CheckState>(standard_item_model_->data(model_index, Qt::CheckStateRole).toInt());
+        if (_checked == Qt::Unchecked) {
+            standard_item_model_->setData(model_index,Qt::Unchecked,Qt::CheckStateRole);
+        } else if (_checked == Qt::Checked) {
+            standard_item_model_->setData(model_index,Qt::Checked,Qt::CheckStateRole);
+        }
+    }
+
+
+}
+
 void PageWidget::initPagingUi()
 {
     paging_control_table_ = new QTableView();
@@ -141,22 +192,15 @@ void PageWidget::initPagingUi()
     connect(select_page_max_row_cb_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PageWidget::switchPageRowSlot);
     connect(paging_control_table_, &QTableView::clicked, this, &PageWidget::mouseClickCellSignal);
 
-    CheckboxHeadView * check_head_view = new CheckboxHeadView(Qt::Horizontal,paging_control_table_);
-
-    // QCheckBox *checkBox = new QCheckBox("选择", this);
-    // check_head_view->setCheckbox(checkBox);
-    // connect(checkBox, &QCheckBox::toggled, this, [this](bool checked) {
-    //     // 在此处处理复选框状态更改的逻辑，例如全选或全不选
-    //     // 比如你可以遍历表格的数据模型，更新所有行的选中状态
-    //     qDebug() << "复选框状态:" << (checked ? "选中" : "未选中");
-    // });
+    check_head_view = new CheckboxHeadView(Qt::Horizontal,paging_control_table_);
 
     // 连接复选框状态变化的信号
-    connect(check_head_view, &CheckboxHeadView::headCheckBoxStatedSignal, this, [this](bool checked) {
-        qDebug() << "复选框状态:" << (checked ? "选中" : "未选中");
-        // 你可以在这里执行其他的逻辑，比如全选或全不选
-    });
+    connect(check_head_view, &CheckboxHeadView::checkStateChanged, this, &PageWidget::updateCheckBoxStateSlot,Qt::UniqueConnection);
     paging_control_table_->setHorizontalHeader(check_head_view);
+
+    // 第一列的复选框状态变化更新表头
+    // standard_item_model_ = new QStandardItemModel();
+
 }
 
 void PageWidget::initPagingStyle()
@@ -165,6 +209,8 @@ void PageWidget::initPagingStyle()
     seek_page_led_->setValidator(new QIntValidator(1, 1, this));
     //设置表格样式
     // paging_control_table_->setHorizontalHeader(new PageingSortHeader(Qt::Horizontal, paging_control_table_));
+    paging_control_table_->setColumnWidth(0,300);
+
     paging_control_table_->horizontalHeader()->setMinimumHeight(40);//最小高度
     paging_control_table_->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);//表头文字左对齐
     paging_control_table_->horizontalHeader()->setStretchLastSection(true);//最后一列拉伸
@@ -204,60 +250,92 @@ void PageWidget::initPagingStyle()
 
 void PageWidget::execSqlWork(const QString &_exec_sql)
 {
-    // QSettings database_ini_file(":/file/database.ini", QSettings::IniFormat);
-
-    QSettings database_ini_file(QCoreApplication::applicationDirPath() + "/res/file/database.ini", QSettings::IniFormat);
-
-    database_ini_file.beginGroup("Database");
-    QString current_thread_id = "";
-    /* 获取当前线程id的数据库连接,如果已经连接则不再添加数据库连接 */
-    {
-        QSqlDatabase paging_control_db;
-        current_thread_id = QString::number((qint64)QThread::currentThreadId());
-        if (QSqlDatabase::contains(current_thread_id)) {
-            paging_control_db = QSqlDatabase::database(current_thread_id);
-        }
-        else {
-            /* 使用当前线程ID作为连接名 */
-            paging_control_db = QSqlDatabase::addDatabase(database_ini_file.value("type").toString().toUpper(), current_thread_id);
-            paging_control_db.setHostName(database_ini_file.value("ip").toString());
-            paging_control_db.setPort(database_ini_file.value("port").toInt());
-            paging_control_db.setDatabaseName(database_ini_file.value("db_name").toString());
-            paging_control_db.setUserName(database_ini_file.value("user").toString());
-            paging_control_db.setPassword(database_ini_file.value("password").toString());
-        }
-
-        if (!paging_control_db.open()) {
-            emit execErrorSignal(paging_control_db.lastError().text());
-        }
-        else {
-            QSqlQuery exec_query(paging_control_db);
-            if (!exec_query.exec(_exec_sql)) {
-                emit execErrorSignal(paging_control_db.lastError().text());
-                return;
-            }
-
-
-            paging_control_db.close();
-        }
+    // QSqlDatabase paging_control_db = createDatabase();
+    QSqlDatabase paging_control_db = QSqlDatabase::addDatabase("QSQLITE");
+    paging_control_db.setDatabaseName("sqlite.db");
+    if(!paging_control_db.open()){
+        qInfo()<<"open is false";
+    }else{
+        qInfo()<<"open is true";
     }
 
-    QSqlDatabase::removeDatabase(current_thread_id);
-    if (total_table_row_ == 0) {
+    QSqlQueryModel * query_model = new QSqlQueryModel;
+    query_model->setQuery(_exec_sql);
+    query_model->setHeaderData(0,Qt::Horizontal,"id");
+    query_model->setHeaderData(1,Qt::Horizontal,"name");
+    query_model->setHeaderData(2,Qt::Horizontal,"age");
 
-        return;
-    }
+
+    paging_control_table_->setModel(query_model);
+    paging_control_table_->show();
+    // QSqlQuery exec_query(paging_control_db);
+    // exec_query.exec(_exec_sql);
+    // while(exec_query.next()){
+
+    // }
+    removeDatabase(paging_control_db);
+
 
 }
 
 QSqlDatabase PageWidget::createDatabase()
 {
+    qDebug() << QSqlDatabase::drivers();
+
     QSettings database_ini_file(":/file/database.ini", QSettings::IniFormat);
     database_ini_file.beginGroup("Database");
 
     QString current_thread_id = QString::number((qint64)QThread::currentThreadId());
-    QSqlDatabase paging_control_db = QSqlDatabase::addDatabase(database_ini_file.value("type").toString().toUpper(),current_thread_id);
+    QSqlDatabase create_database;
 
+    if(QSqlDatabase::contains(current_thread_id)){
+        create_database = QSqlDatabase::database(current_thread_id);
+    }else{
+        /* 使用当前线程ID作为连接名 */
+
+        QString name = database_ini_file.value("type").toString().toUpper();
+        create_database = QSqlDatabase::addDatabase(database_ini_file.value("type").toString().toUpper(), current_thread_id);
+        create_database.setHostName(database_ini_file.value("ip").toString());
+        create_database.setPort(database_ini_file.value("port").toInt());
+        create_database.setDatabaseName(database_ini_file.value("db_name").toString());
+        create_database.setUserName(database_ini_file.value("user").toString());
+        create_database.setPassword(database_ini_file.value("password").toString());
+
+    }
+    if(!create_database.isOpen()){
+        create_database.open();
+    }
+    if(!create_database.isOpen()){
+        qCritical() << QString("数据库打开失败.");
+        QString text =  create_database.lastError().text();
+        qInfo()<<text;
+    }
+    return create_database;
+}
+
+void PageWidget::removeDatabase()
+{
+    QStringList connection_name_list = QSqlDatabase::connectionNames();
+    for(QString connection_name : connection_name_list) {
+        QSqlDatabase database = QSqlDatabase::database(connection_name);
+        if(database.isOpen()){
+            database.close();
+        }
+        QSqlDatabase::removeDatabase(connection_name);
+    }
+}
+
+bool PageWidget::removeDatabase(QSqlDatabase _database)
+{
+    QString conection_name = _database.databaseName();
+    if(!QSqlDatabase::contains(conection_name)){
+        return false;
+    }
+    if(_database.isOpen()){
+        _database.close();
+    }
+    QSqlDatabase::removeDatabase(conection_name);
+    return true;
 }
 
 QString PageWidget::generateUUID()
@@ -267,8 +345,6 @@ QString PageWidget::generateUUID()
 
 CheckboxHeadView::CheckboxHeadView(Qt::Orientation orientation, QWidget *parent) : QHeaderView(orientation,parent)
 {
-    // check_box_ = new QCheckBox(this);
-    // check_box_->setVisible(false);
 }
 
 CheckboxHeadView::~CheckboxHeadView()
@@ -286,14 +362,13 @@ bool CheckboxHeadView::getCheckedState()
     return _is_checked;
 }
 
-void CheckboxHeadView::setHeaderCheckState(Qt::CheckState _state)
+void CheckboxHeadView::setCheckState(Qt::CheckState _state)
 {
     check_state_ = _state;
 }
 
 void CheckboxHeadView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const
 {
-
     if(logicalIndex == 0){
         QStyleOptionButton option;
         option.rect = rect.adjusted(10,5,-5,-5);
@@ -320,11 +395,18 @@ void CheckboxHeadView::mousePressEvent(QMouseEvent *event)
     int section = sectionViewportPosition(0);
     int width = sectionSize(0);
     QRect check_rect(section+5,0,width-10,height());
-    if(check_rect.contains(event->pos())){
-        _is_checked = !_is_checked;
-        emit headCheckBoxStatedSignal(_is_checked);
+    if (check_rect.contains(event->pos())) {
+        // 切换复选框状态
+        if (check_state_ == Qt::Checked) {
+            setCheckState(Qt::Unchecked);
+        }
+        else {
+            setCheckState(Qt::Checked);
+        }
+        // 更新复选框状态
         viewport()->update();
-    }else{
+        emit checkStateChanged(check_state_);
+    } else {
         QHeaderView::mousePressEvent(event);
     }
 
@@ -338,4 +420,51 @@ CustomQueryModel::CustomQueryModel(QObject *parent)
 CustomQueryModel::~CustomQueryModel()
 {
 
+}
+
+bool CustomQueryModel::setName(int studentId, const QString &name)
+{
+    QSqlQuery query;
+    query.prepare("update student set name = ? where id = ?");
+    query.addBindValue(name);
+    query.addBindValue(studentId);
+    return query.exec();
+}
+
+void CustomQueryModel::refresh()
+{
+    setQuery("select * from student");
+    setHeaderData(0, Qt::Horizontal, QObject::tr("id"));
+    setHeaderData(1, Qt::Horizontal, QObject::tr("name"));
+}
+
+Qt::ItemFlags CustomQueryModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags falgs = QSqlQueryModel::flags(index);
+    if(index.column() == 1){
+        falgs |= Qt::ItemIsEditable;
+    }
+    return falgs;
+}
+
+QVariant CustomQueryModel::data(const QModelIndex &index, int role) const
+{
+    QVariant value = QSqlQueryModel::data(index, role);
+/*    if (role == Qt::TextColorRole && index.column() == 0)
+        return qVariantFromValue(QColor(Qt::red));*/ //第一个属性的字体颜色为红色
+    return value;
+}
+
+bool CustomQueryModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    // if (index.column() < 1 || index.column() > 2)
+    //     return false;
+    // QModelIndex primaryKeyIndex = QSqlQueryModel::index(index.row(), 0);
+    // int id = data(primaryKeyIndex).toInt(); //获取id号
+    // clear();
+    // bool ok;
+    // if (index.column() == 1) //第二个属性可更改
+    //     ok = setName(id, value.toString());
+    // refresh();
+    // return ok;
 }
