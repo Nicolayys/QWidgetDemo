@@ -22,6 +22,7 @@
 #include <QComboBox>
 #include <QSqlQueryModel>
 #include <QCheckBox>
+#include <QFile>
 namespace Ui {
 class PageWidget;
 }
@@ -200,11 +201,14 @@ public:
     void refresh();
     // QAbstractItemModel interface
 public:
+    // 返回指定索引项的标志。
     Qt::ItemFlags flags(const QModelIndex &index) const;
+    // 返回指定索引处的数据,改变数据的显示
     QVariant data(const QModelIndex &index, int role) const;
+    //当用户通过视图（例如 QTableView）编辑某个单元格时，视图会调用 setData() 来将新的数据传递到模型中。
     bool setData(const QModelIndex &index, const QVariant &value, int role);
-};
 
+};
 
 
 

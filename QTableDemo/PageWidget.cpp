@@ -9,7 +9,7 @@ PageWidget::PageWidget(QWidget *parent)
 {
     initPagingUi();
     initPagingStyle();
-    execSqlWork("SELECT * FROM students");
+    execSqlWork("SELECT * FROM student");
 }
 
 PageWidget::~PageWidget()
@@ -259,11 +259,11 @@ void PageWidget::execSqlWork(const QString &_exec_sql)
         qInfo()<<"open is true";
     }
 
-    QSqlQueryModel * query_model = new QSqlQueryModel;
+    // QSqlQueryModel * query_model = new QSqlQueryModel;
+    CustomQueryModel * query_model = new CustomQueryModel;
     query_model->setQuery(_exec_sql);
     query_model->setHeaderData(0,Qt::Horizontal,"id");
     query_model->setHeaderData(1,Qt::Horizontal,"name");
-    query_model->setHeaderData(2,Qt::Horizontal,"age");
 
 
     paging_control_table_->setModel(query_model);
@@ -449,22 +449,53 @@ Qt::ItemFlags CustomQueryModel::flags(const QModelIndex &index) const
 
 QVariant CustomQueryModel::data(const QModelIndex &index, int role) const
 {
+
     QVariant value = QSqlQueryModel::data(index, role);
-/*    if (role == Qt::TextColorRole && index.column() == 0)
-        return qVariantFromValue(QColor(Qt::red));*/ //第一个属性的字体颜色为红色
+   if (role == Qt::ForegroundRole  && index.column() == 0)
+        return QVariant::fromValue(QColor(Qt::red)); //第一个属性的字体颜色为红色
+
+   // 如果是复选框列
+   if (role == Qt::CheckStateRole && index.column() == 1) {
+       // 假设我们想将第二列作为复选框列
+       // 可以根据需求修改以下逻辑，例如存储每行的复选框状态
+
+       return checkStates.at(index.row()) ? Qt::Checked : Qt::Unchecked;
+   }
     return value;
+
+    if (!index.isValid()) {
+        return QVariant();
+    }
+
+    if (role == Qt::DisplayRole) {
+        if (index.column() == 0) {
+            return QVariant(index.row() + 1);  // 序号列：从 1 开始
+        } else if (index.column() == 1) {
+            // return QVariant(checkStates.at(index.row()));
+        } else {
+            return QVariant("Data " + QString::number(index.row() + 1));
+        }
+    }
+
+    if (role == Qt::EditRole) {
+        if (index.column() == 1) {
+            // return QVariant(checkStates.at(index.row()));  // 复选框列可编辑
+        }
+    }
+
+    return QVariant();
 }
 
 bool CustomQueryModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    // if (index.column() < 1 || index.column() > 2)
-    //     return false;
-    // QModelIndex primaryKeyIndex = QSqlQueryModel::index(index.row(), 0);
-    // int id = data(primaryKeyIndex).toInt(); //获取id号
-    // clear();
-    // bool ok;
-    // if (index.column() == 1) //第二个属性可更改
-    //     ok = setName(id, value.toString());
-    // refresh();
-    // return ok;
+    if (index.column() < 1 || index.column() > 2)
+        return false;
+    QModelIndex primaryKeyIndex = QSqlQueryModel::index(index.row(), 0);
+    int id = data(primaryKeyIndex,role).toInt(); //获取id号
+    clear();
+    bool ok = false;
+    if (index.column() == 1) //第二个属性可更改
+        ok = setName(id, value.toString());
+    refresh();
+    return ok;
 }
