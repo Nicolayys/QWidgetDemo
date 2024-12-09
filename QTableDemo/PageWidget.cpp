@@ -459,7 +459,7 @@ QVariant CustomQueryModel::data(const QModelIndex &index, int role) const
        // 假设我们想将第二列作为复选框列
        // 可以根据需求修改以下逻辑，例如存储每行的复选框状态
 
-       return checkStates.at(index.row()) ? Qt::Checked : Qt::Unchecked;
+       // return checkStates.at(index.row()) ? Qt::Checked : Qt::Unchecked;
    }
     return value;
 
